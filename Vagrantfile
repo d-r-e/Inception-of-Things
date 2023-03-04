@@ -9,6 +9,7 @@ Vagrant.configure(2) do |config|
             vb.gui = false
             vb.customize ["modifyvm", :id, "--nested-hw-virt", "on"] # enable nested virtualization
         end
+        iot.vm.synced_folder ".", "/vagrant", disabled: true
 
         iot.vm :ssh do |ssh|
             ssh.forward_agent = true

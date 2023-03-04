@@ -1,4 +1,5 @@
-TOKEN = ""
+TOKEN = "42424242424242"
+
 # if .env and TOKEN in .env, read from .env file
 env_file = File.join(File.dirname(__FILE__), ".env")
 if File.exist?(env_file)
@@ -12,15 +13,11 @@ end
 Vagrant.configure("2") do |config|
   config.vm.box = "generic/alpine317"
   config.vm.box_url = "https://app.vagrantup.com/generic/boxes/alpine317"
-  # Here are the expected specifications:
-  # The machine names are darodrig + some key letters. The hostname
-  # of the first machine must be followed by the capital letter S (like Server). The
-  # hostname of the second machine must be followed by SW (like ServerWorker).
 
   config.vm.define "darodrigS" do |server|
     server.vm.hostname = "darodrigS"
     server.vm.synced_folder ".", "/vagrant"
-    server.vm.provider :libvirt do |vb|
+    server.vm.provider :virtualbox do |vb|
       vb.memory = 512
       vb.cpus = 1
       vb.gui = false
@@ -34,7 +31,7 @@ Vagrant.configure("2") do |config|
   config.vm.define "darodrigSW" do |worker|
     worker.vm.hostname = "darodrigSW"
     worker.vm.synced_folder ".", "/vagrant"
-    worker.vm.provider :libvirt do |vb|
+    worker.vm.provider :virtualbox do |vb|
       vb.memory = 512
       vb.cpus = 1
       vb.gui = false
