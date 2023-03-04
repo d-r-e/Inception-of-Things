@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-DEPENDENCIES=(lynx wget gnupg)
+DEPENDENCIES=(lynx wget gnupg ruby-full)
 
 # Install dependencies
 for dep in "${DEPENDENCIES[@]}"; do
