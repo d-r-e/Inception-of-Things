@@ -1,23 +1,30 @@
-# Two machines using k3s, one as a server, one as a worker.
-
 Vagrant.configure("2") do |config|
-  config.vm.box = "alpine/alpine64"
-  config.vm.box_url = "https://app.vagrantup.com/alpine/boxes/alpine64"
+  config.vm.box = "generic/alpine317"
+  config.vm.box_url ="https://app.vagrantup.com/generic/boxes/alpine317"
 
-  # The first machine will have darodrigS as hostname. It will have 512MB of RAM and 1 CPU.
+
+  # Here are the expected specifications:
+    # The machine names must be the login of someone of your team. The hostname
+	# of the first machine must be followed by the capital letter S (like Server). The
+	# hostname of the second machine must be followed by SW (like ServerWorker).
+
+
+
   config.vm.define "darodrigS" do |control|
+	control.vm.hostname = "darodrigS"
+	control.vm.network "private_network", ip: "192.168.56.110"
+	control.vm.synced_folder ".", "/vagrant"
 
-    control.vm.provider :virtualbox do |vb|
-      vb.memory = 512
-      vb.cpus = 1
-      vb.gui = false
-    end
-    control.vm.provision "shell", inline: "echo 'vagrant:darodrig' | chpasswd"
-    control.vm.provision "shell", inline: "echo 'root:darodrig' | chpasswd"
-    control.vm.provision "shell", inline: "echo 'vagrant ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers"
+	control.vm.provider :virtualbox do |vb|
+		vb.memory = 512
+		vb.cpus = 1
+		vb.gui = false
+	end
 
-  
-    control.vm.network "private_network", ip: "192.168.56.110"
+	control.vm.provision :shell, privileged:true, inline: "apk add --update --no-cache curl bash"
+	control.vm.provision :shell, privileged:true, path: "./scripts/server.sh"
 
-  end
+	end
+
+	
 end
