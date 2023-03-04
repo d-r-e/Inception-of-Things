@@ -1,7 +1,8 @@
 #!/bin/bash
 set -e
 
-DEPENDENCIES=(lynx wget gnupg ruby-full)
+
+DEPENDENCIES=(lynx wget gnupg ruby-full curl qemu-kvm libvirt-daemon-system ncdu)
 
 # Install dependencies
 for dep in "${DEPENDENCIES[@]}"; do
@@ -41,3 +42,21 @@ else
     echo -e [+] "\e[32mVagrant already installed.\e[0m"
     sleep 0.2
 fi
+
+
+# install kubectl
+if [ -z "$(which kubectl)" ]; then
+    echo "Installing kubectl..."
+    curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+    install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
+    echo -e [+] "\e[32mKubectl installed successfully!\e[0m"
+    if [ $(echo $SHELL | grep -c "zsh") -eq 1 ]; then
+        echo "source <(kubectl completion zsh)" >> ~/.zshrc
+    elif [ $(echo $SHELL | grep -c "bash") -eq 1 ]; then
+        echo "source <(kubectl completion bash)" >> ~/.bashrc
+    fi
+else
+    echo -e [+] "\e[32mKubectl already installed.\e[0m"
+    sleep 0.2
+fi
+

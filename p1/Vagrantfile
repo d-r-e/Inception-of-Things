@@ -1,37 +1,45 @@
-TOKEN = "323482354817234235"
+TOKEN = ""
+# if .env and TOKEN in .env, read from .env file
+env_file = File.join(File.dirname(__FILE__), ".env")
+if File.exist?(env_file)
+  File.readlines(env_file).each do |line|
+    if line =~ /^TOKEN=(.*)/
+      TOKEN = $1
+    end
+  end
+end
 
 Vagrant.configure("2") do |config|
   config.vm.box = "generic/alpine317"
   config.vm.box_url = "https://app.vagrantup.com/generic/boxes/alpine317"
-
   # Here are the expected specifications:
-  # The machine names must be the login of someone of your team. The hostname
+  # The machine names are darodrig + some key letters. The hostname
   # of the first machine must be followed by the capital letter S (like Server). The
   # hostname of the second machine must be followed by SW (like ServerWorker).
 
   config.vm.define "darodrigS" do |server|
     server.vm.hostname = "darodrigS"
-    server.vm.network "private_network", ip: "192.168.56.110"
     server.vm.synced_folder ".", "/vagrant"
-    server.vm.provider :virtualbox do |vb|
+    server.vm.provider :libvirt do |vb|
       vb.memory = 512
       vb.cpus = 1
       vb.gui = false
     end
-
+    
+    server.vm.network "private_network", ip: "192.168.56.110"
     server.vm.provision :shell, privileged: true, inline: "apk add --update --no-cache curl bash"
     server.vm.provision :shell, privileged: true, path: "./scripts/server.sh", args: ["192.168.56.110", TOKEN]
   end
 
   config.vm.define "darodrigSW" do |worker|
     worker.vm.hostname = "darodrigSW"
-    worker.vm.network "private_network", ip: "192.168.56.111"
     worker.vm.synced_folder ".", "/vagrant"
-    worker.vm.provider :virtualbox do |vb|
+    worker.vm.provider :libvirt do |vb|
       vb.memory = 512
       vb.cpus = 1
       vb.gui = false
     end
+    worker.vm.network "private_network", ip: "192.168.56.111"
 
     worker.vm.provision :shell, privileged: true, inline: "apk add --update --no-cache curl bash"
     worker.vm.provision :shell, privileged: true, path: "./scripts/worker.sh", args: ["192.168.56.111", TOKEN]
