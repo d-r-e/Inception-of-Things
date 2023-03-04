@@ -10,13 +10,10 @@ Vagrant.configure(2) do |config|
             vb.customize ["modifyvm", :id, "--nested-hw-virt", "on"] # enable nested virtualization
         end
         iot.vm.synced_folder ".", "/vagrant", disabled: true
-
         iot.vm :ssh do |ssh|
             ssh.forward_agent = true
             ssh.forward_x11 = true
         end
-
-
         iot.vm.network "public_network", bridge: "bridge0", ip: "10.200.11.155"
         iot.vm.provision :shell, privileged: true, path: "./p1/scripts/deps.sh"
     end

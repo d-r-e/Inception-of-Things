@@ -16,3 +16,5 @@ else
     echo -e [+] "\e[32mK3s already installed.\e[0m"
 fi
 
+cat /etc/rancher/k3s/k3s.yaml >  /vagrant/k3s.yaml
+
