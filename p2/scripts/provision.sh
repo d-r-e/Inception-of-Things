@@ -23,5 +23,4 @@ echo [Inception-Of-Things] "App2 deployed successfully."
 k apply -f /vagrant/confs/app3.yaml
 echo [Inception-Of-Things] "App3 deployed successfully."
 k apply -f /vagrant/confs/ingress.yaml
-
 echo -e [Inception-Of-Things] "Ingress deployed successfully!"
