@@ -7,6 +7,7 @@ USER=darodrig
 ```
 mkdir -p /goinfre/$USER/.vagrant.d
 mkdir -p /goinfre/$USER/.vbox
+rm -rf $HOME/VirtualBox\ VMs
 ln -s $HOME/VirtualBox\ VMs /goinfre/$USER/.vbox
 VAGRANT_HOME=/goinfre/$USER/.vagrant.d vagrant up
 vagrant ssh iot
