@@ -1,3 +1,4 @@
 *.iso
 *.pdf
 .vagrant
+.env
