@@ -1,0 +1,25 @@
+File.open(".env", "r") do |f|
+    f.each_line do |line|
+        if line =~ /K3S_TOKEN/
+            K3S_TOKEN = line.split("=")[1].chomp
+        end
+    end
+end
+
+Vagrant.configure("2") do |config|
+    config.vm.box = "generic/alpine317"
+    config.vm.define "darodrigS" do |server|
+        server.vm.hostname = "darodrigS"
+        server.vm.network "private_network", ip: "192.168.56.110"
+        server.vm.provider "virtualbox" do |v|
+            v.name = "darodrigS"
+            v.memory = 1024
+            v.cpus = 2
+        end
+        server.vm.provision "shell", inline: <<-SHELL
+        apk add --update lynx
+        curl -sfL https://get.k3s.io | K3S_KUBECONFIG_MODE="644" K3S_TOKEN="420000000000000000000042" INSTALL_K3S_EXEC="--flannel-iface eth1" sh -s -
+        echo 'alias k="sudo k3s kubectl"' >> /home/vagrant/.bashrc
+        SHELL
+    end    
+end
