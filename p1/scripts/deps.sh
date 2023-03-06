@@ -1,29 +1,36 @@
 #!/bin/bash
 set -e
 
-apt-get update && apt-get upgrade -y >/dev/null
 
-DEPENDENCIES=(lynx wget gnupg curl ncdu linux-headers-amd64 linux-headers-4.19.0-21-amd64)
+function install_deps(){
+    apt-get update && apt-get upgrade -y >/dev/null
 
-# Install dependencies
-for dep in "${DEPENDENCIES[@]}"; do
-    if [ -z "$(which $dep)" ]; then
-        echo "Installing $dep..."
-        apt-get install -yq $dep >/dev/null
-        echo -e [+] "\e[32m$dep installed successfully!\e[0m"
-    else
-        echo -e [+] "\e[32m$dep already installed.\e[0m"
-        sleep 0.2
-    fi
-done
+    DEPENDENCIES=(lynx wget gnupg curl ncdu linux-headers-amd64 )
+
+    # Install dependencies
+    for dep in "${DEPENDENCIES[@]}"; do
+        if [ -z "$(which $dep)" ]; then
+            echo "Installing $dep..."
+            apt-get install -y $dep >/dev/null
+            echo -e [+] "\e[32m$dep installed successfully!\e[0m"
+        else
+            echo -e [+] "\e[32m$dep already installed.\e[0m"
+            sleep 0.2
+        fi
+    done
+
+}
+
+install_deps
 
 # Install virtualbox
 if [ -z "$(which virtualbox)" ]; then
-    echo "Installing virtualbox..."
+    echo "Downloading virtualbox..."
     if [ ! -f /tmp/virtualbox.deb ]; then
-        wget https://download.virtualbox.org/virtualbox/7.0.6/virtualbox-7.0_7.0.6-155176~Debian~buster_amd64.deb -O /tmp/virtualbox.deb  2>&1
+        wget https://download.virtualbox.org/virtualbox/7.0.6/virtualbox-7.0_7.0.6-155176~Debian~bullseye_amd64.deb -O /tmp/virtualbox.deb  2>&1
     fi
-    apt-get install -y /tmp/virtualbox.deb >/dev/null
+    echo "Installing virtualbox..."
+    apt-get install -y /tmp/virtualbox.deb
     echo -e [+] "\e[32mVirtualbox installed successfully!\e[0m"
     # Clean up
     rm /tmp/virtualbox.deb >/dev/null 2>&1 && echo -e [+] "\e[32mCleaned up successfully!\e[0m" || true
@@ -46,20 +53,59 @@ else
     sleep 0.2
 fi
 
+# apt install  -y lightdm
+# dpkg-reconfigure lightdm
+# /usr/sbin/lightdm --show-config
+# sed -i 's/#autologin-user=/autologin-user=vagrant/g' /etc/lightdm/lightdm.conf
+# sed -i 's/#autologin-user-timeout=0/autologin-user-timeout=0/g' /etc/lightdm/lightdm.conf
 
-# install kubectl
-if [ -z "$(which kubectl)" ]; then
-    echo "Installing kubectl..."
-    curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
-    install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
-    echo -e [+] "\e[32mKubectl installed successfully!\e[0m"
-    if [ $(echo $SHELL | grep -c "zsh") -eq 1 ]; then
-        echo "source <(kubectl completion zsh)" >> ~/.zshrc
-    elif [ $(echo $SHELL | grep -c "bash") -eq 1 ]; then
-        echo "source <(kubectl completion bash)" >> ~/.bashrc
-    fi
-else
-    echo -e [+] "\e[32mKubectl already installed.\e[0m"
-    sleep 0.2
-fi
+# sed -i 's/#greeter-hide-users=false/greeter-hide-users=true/g' /etc/lightdm/lightdm.conf
+# apt install-y lightdm-gtk-greeter-settings
+# /sbin/reboot
+
+
+# Install xfce desktop
+chown vagrant:vagrant /home/vagrant/.xsessionrc
+
+cat << EOF > /home/vagrant/.xsessionrc
+/home/vagrant/.xsessionrc
+# Lightdm sources .xsessionrc
+# Add env variables here
+
+# source the system profile
+# if [ -f /etc/profile ]; then
+#     . /etc/profile
+# fi
+
+# QT5 qt5ct
+export QT_QPA_PLATFORMTHEME=qt5ct
+
+# QT5 scaling
+# Uncomment for hidpi display
+# export QT_AUTO_SCREEN_SCALE_FACTOR=1
+# export QT_SCREEN_SCALE_FACTORS=2
+
+EOF
+
+apt install -y \
+    libxfce4ui-utils \
+    thunar \
+    xfce4-appfinder \
+    xfce4-panel \
+    xfce4-pulseaudio-plugin \
+    xfce4-whiskermenu-plugin \
+    xfce4-session \
+    xfce4-settings \
+    xfce4-terminal \
+    xfconf \
+    xfdesktop4 \
+    xfwm4 \
+    adwaita-qt \
+    qt5ct 
+
+echo 
+echo xfce install complete, please reboot and issue 'startx'
+echo
+
+ln -s /vagrant /home/vagrant/Desktop/vagrant
 
