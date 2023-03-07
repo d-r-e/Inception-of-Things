@@ -11,7 +11,7 @@ function install_deps(){
     for dep in "${DEPENDENCIES[@]}"; do
         if [ -z "$(which $dep)" ]; then
             echo "Installing $dep..."
-            apt-get install -y $dep >/dev/null
+            apt install -y $dep >/dev/null
             echo -e [+] "\e[32m$dep installed successfully!\e[0m"
         else
             echo -e [+] "\e[32m$dep already installed.\e[0m"
@@ -63,11 +63,11 @@ fi
 # apt install-y lightdm-gtk-greeter-settings
 # /sbin/reboot
 
+# test if xfce is installed
+if [ -z "$(which startxfce4)" ]; then
+    echo "Installing xfce..."
 
-# Install xfce desktop
-chown vagrant:vagrant /home/vagrant/.xsessionrc
-
-cat << EOF > /home/vagrant/.xsessionrc
+    cat << EOF > /home/vagrant/.xsessionrc
 /home/vagrant/.xsessionrc
 # Lightdm sources .xsessionrc
 # Add env variables here
@@ -87,25 +87,27 @@ export QT_QPA_PLATFORMTHEME=qt5ct
 
 EOF
 
-apt install -y \
-    libxfce4ui-utils \
-    thunar \
-    xfce4-appfinder \
-    xfce4-panel \
-    xfce4-pulseaudio-plugin \
-    xfce4-whiskermenu-plugin \
-    xfce4-session \
-    xfce4-settings \
-    xfce4-terminal \
-    xfconf \
-    xfdesktop4 \
-    xfwm4 \
-    adwaita-qt \
-    qt5ct 
+    chown vagrant:vagrant /home/vagrant/.xsessionrc
+    apt install -y \
+        libxfce4ui-utils \
+        thunar \
+        xfce4-appfinder \
+        xfce4-panel \
+        xfce4-pulseaudio-plugin \
+        xfce4-whiskermenu-plugin \
+        xfce4-session \
+        xfce4-settings \
+        xfce4-terminal \
+        xfconf \
+        xfdesktop4 \
+        xfwm4 \
+        adwaita-qt \
+        qt5ct 
 
-echo 
-echo xfce install complete, please reboot and issue 'startx'
-echo
-
-ln -s /vagrant /home/vagrant/Desktop/vagrant
+    /sbin/reboot
+    echo
+else
+    echo -e [+] "\e[32mXfce already installed.\e[0m"
+    sleep 0.2
+fi
 
