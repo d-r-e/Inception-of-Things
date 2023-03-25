@@ -16,8 +16,7 @@ mkdir -p /goinfre/$USER/.vbox
 rm -rf $HOME/VirtualBox\ VMs
 ln -s $HOME/VirtualBox\ VMs /goinfre/$USER/.vbox
 ln -s /goinfre/$USER/.vagrant.d $HOME/.vagrant.d
-VAGRANT_HOME=/goinfre/$USER/.vagrant.d vagrant up
-vagrant ssh iot
+VAGRANT_HOME=/goinfre/$USER/.vagrant.d vagrant up --provision
 ```
 
 To get the ssh-config file, run the following command:
