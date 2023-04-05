@@ -5,13 +5,13 @@ set -e
 function install_deps(){
     apt-get update && apt-get upgrade -y >/dev/null
 
-    DEPENDENCIES=(lynx wget gnupg curl ncdu linux-headers-amd64  linux-headers-5.10.0-20-amd64)
+    DEPENDENCIES=(zsh midori lynx git wget gnupg curl ncdu linux-headers-amd64  linux-headers-5.10.0-20-amd64)
 
     # Install dependencies
     for dep in "${DEPENDENCIES[@]}"; do
         if [ -z "$(which $dep)" ]; then
             echo "Installing $dep..."
-            apt install -y $dep >/dev/null
+            apt-get install -yq $dep >/dev/null
             echo -e [+] "\e[32m$dep installed successfully!\e[0m"
         else
             echo -e [+] "\e[32m$dep already installed.\e[0m"
@@ -21,7 +21,25 @@ function install_deps(){
 
 }
 
+
+function set_keyboard_layout(){
+    # Set keyboard layout
+    if [ -z "$(grep -i 'setxkbmap -layout es' /etc/rc.local)" ]; then
+        echo "Setting keyboard layout..."
+        sed -i 's/exit 0//g' /etc/rc.local
+        echo "setxkbmap -layout es" >> /etc/rc.local
+        echo "exit 0" >> /etc/rc.local
+        echo -e [+] "\e[32mKeyboard layout set successfully!\e[0m"
+    else
+        echo -e [+] "\e[32mKeyboard layout already set.\e[0m"
+        sleep 0.2
+    fi
+}
+
 install_deps
+
+
+chsh -s /bin/zsh vagrant
 
 # Install virtualbox
 if [ -z "$(which virtualbox)" ]; then
@@ -122,3 +140,7 @@ fi
 if [ -z "$(which k)" ]; then
     echo 'alias k=kubectl' >> /home/vagrant/.bashrc
 fi
+
+echo "192.168.56.110" app1.com >> /etc/hosts
+echo "192.168.56.110" app2.com >> /etc/hosts
+echo "192.168.56.110" app3.com >> /etc/hosts
