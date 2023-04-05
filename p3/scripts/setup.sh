@@ -18,8 +18,12 @@ if [ -z "$(which k3d)" ]; then
     curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl" 
     sudo install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
     kubectl version --client
-    echo 'alias k="kubectl"' >> ~/.bashrc
-    echo 'alias k="kubectl"' >> /root/.profile
+    echo 'alias k=kubectl' >>~/.bashrc
+    echo 'source <(kubectl completion bash)' >>~/.bashrc
+    echo 'source <(kubectl completion bash)' >>/root/.bashrc
+    kubectl completion bash >/etc/bash_completion.d/kubectl
+
+
 
     echo [+] K3d and kubectl installed successfully!
 else
@@ -29,9 +33,10 @@ fi
 
 if [ -z "$(k3d cluster list | grep iot)" ];then
     echo "Creating k3d cluster..."
-    k3d cluster create iot
+    k3d cluster create  --port 8888:8888@loadbalancer  --port 80:80@loadbalancer iot
     echo [+] K3d cluster created successfully!
 else
     echo [+] K3d cluster already created.
     sleep 0.2
 fi
+

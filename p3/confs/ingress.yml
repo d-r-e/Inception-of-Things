@@ -1,0 +1,35 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: argocd-ingress-service
+  namespace: argocd
+spec:
+  rules:
+  - host: argocd.local
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: argocd-server
+            port:
+              number: 443
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: dev-ingress-service
+  namespace: dev
+spec:
+  rules:
+  - host: wil42.local
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: wil-playground
+            port:
+              number: 8888

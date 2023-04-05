@@ -22,19 +22,6 @@ function install_deps(){
 }
 
 
-function set_keyboard_layout(){
-    # Set keyboard layout
-    if [ -z "$(grep -i 'setxkbmap -layout es' /etc/rc.local)" ]; then
-        echo "Setting keyboard layout..."
-        sed -i 's/exit 0//g' /etc/rc.local
-        echo "setxkbmap -layout es" >> /etc/rc.local
-        echo "exit 0" >> /etc/rc.local
-        echo -e [+] "\e[32mKeyboard layout set successfully!\e[0m"
-    else
-        echo -e [+] "\e[32mKeyboard layout already set.\e[0m"
-        sleep 0.2
-    fi
-}
 
 install_deps
 
@@ -73,10 +60,33 @@ else
     sleep 0.2
 fi
 
-if [ -z "$(which kubectl)" ];then
-  curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
-  sudo install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
-fi
+
+function install_docker(){
+    apt-get remove docker docker-engine docker.io containerd runc || true
+    apt-get update
+    apt-get install \
+    ca-certificates \
+    curl \
+    gnupg
+    mkdir -m 0755 -p /etc/apt/keyrings 
+    curl -fsSL https://download.docker.com/linux/debian/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+    echo "deb [arch="$(dpkg --print-architecture)" signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/debian "$(. /etc/os-release && echo "$VERSION_CODENAME")" stable" | \
+    sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+    sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+    sudo docker run hello-world
+    sudo groupadd docker
+    sudo usermod -aG docker $USER
+    sudo usermod -aG docker vagrant
+    newgrp docker
+    sudo systemctl enable docker.service
+    sudo systemctl enable containerd.service
+    docker info
+}
+
+# if [ -z "$(which kubectl)" ];then
+#   curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+#   sudo install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
+# fi
 
 # apt install  -y lightdm
 # dpkg-reconfigure lightdm
@@ -144,3 +154,5 @@ fi
 echo "192.168.56.110" app1.com >> /etc/hosts
 echo "192.168.56.110" app2.com >> /etc/hosts
 echo "192.168.56.110" app3.com >> /etc/hosts
+echo "127.0.0.1" argocd.local >> /etc/hosts
+echo "127.0.0.1" wil42.local >> /etc/hosts
