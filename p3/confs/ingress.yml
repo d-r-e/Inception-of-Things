@@ -5,31 +5,31 @@ metadata:
   namespace: argocd
 spec:
   rules:
-  - host: argocd.local
-    http:
+  - http:
+      # listen on path /argo-cd on port 8080
       paths:
-      - path: /
+      - path: /argo-cd
         pathType: Prefix
         backend:
           service:
             name: argocd-server
             port:
-              number: 443
----
-apiVersion: networking.k8s.io/v1
-kind: Ingress
-metadata:
-  name: dev-ingress-service
-  namespace: dev
-spec:
-  rules:
-  - host: wil42.local
-    http:
-      paths:
-      - path: /
-        pathType: Prefix
-        backend:
-          service:
-            name: wil-playground
-            port:
-              number: 8888
+              number: 8080
+              
+# ---
+# apiVersion: networking.k8s.io/v1
+# kind: Ingress
+# metadata:
+#   name: dev-ingress-service
+#   namespace: dev
+# spec:
+#   rules:
+#   - http:
+#       paths:
+#       - path: /
+#         pathType: Prefix
+#         backend:
+#           service:
+#             name: wil-playground
+#             port:
+#               number: 8888
