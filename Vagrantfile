@@ -6,7 +6,13 @@ Vagrant.configure(2) do |config|
             vb.memory = 4096
             vb.cpus = 6
             vb.gui = false
-            vb.customize ["modifyvm", :id, "--nested-hw-virt", "on"] # enable nested virtualization
+            vb.customize [
+                "modifyvm", :id,
+                "--nested-hw-virt", "on",]
+            vb.customize [
+                "modifyvm", :id,
+                "--vram", "256",
+            ]
         end
         iot.vm.synced_folder ".", "/home/vagrant/iot/"
         iot.vm :ssh do |ssh|

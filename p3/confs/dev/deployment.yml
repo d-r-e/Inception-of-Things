@@ -30,3 +30,21 @@ spec:
           
           ports:
             - containerPort: 8888
+---
+kind: Ingress
+apiVersion: networking.k8s.io/v1
+metadata:
+  name: wil-playground-ingress-service
+  namespace: dev
+spec:
+  rules:
+  - host: wil-playground.local
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: wil-playground
+            port:
+              number: 8888

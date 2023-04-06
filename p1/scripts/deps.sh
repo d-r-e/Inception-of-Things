@@ -5,7 +5,7 @@ set -e
 function install_deps(){
     apt-get update && apt-get upgrade -y >/dev/null
 
-    DEPENDENCIES=(zsh midori lynx git wget gnupg curl ncdu linux-headers-amd64  linux-headers-5.10.0-20-amd64)
+    DEPENDENCIES=(zsh firefox-esr git wget gnupg curl ncdu linux-headers-amd64  linux-headers-5.10.0-20-amd64)
 
     # Install dependencies
     for dep in "${DEPENDENCIES[@]}"; do
@@ -61,27 +61,7 @@ else
 fi
 
 
-function install_docker(){
-    apt-get remove docker docker-engine docker.io containerd runc || true
-    apt-get update
-    apt-get install \
-    ca-certificates \
-    curl \
-    gnupg
-    mkdir -m 0755 -p /etc/apt/keyrings 
-    curl -fsSL https://download.docker.com/linux/debian/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
-    echo "deb [arch="$(dpkg --print-architecture)" signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/debian "$(. /etc/os-release && echo "$VERSION_CODENAME")" stable" | \
-    sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
-    sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
-    sudo docker run hello-world
-    sudo groupadd docker
-    sudo usermod -aG docker $USER
-    sudo usermod -aG docker vagrant
-    newgrp docker
-    sudo systemctl enable docker.service
-    sudo systemctl enable containerd.service
-    docker info
-}
+
 
 # if [ -z "$(which kubectl)" ];then
 #   curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
@@ -98,7 +78,23 @@ function install_docker(){
 # apt install-y lightdm-gtk-greeter-settings
 # /sbin/reboot
 
-# test if xfce is installed
+
+if [ -z "$(which k)" ]; then
+    echo 'alias k=kubectl' >> /home/vagrant/.bashrc
+fi
+
+echo "192.168.56.110" app1.com >> /etc/hosts
+echo "192.168.56.110" app2.com >> /etc/hosts
+echo "192.168.56.110" app3.com >> /etc/hosts
+echo "127.0.0.1" argocd.local >> /etc/hosts
+echo "127.0.0.1" wil42.local >> /etc/hosts
+echo "Hosts file updated"
+
+# Install argocd cli
+# https://github.com/argoproj/argo-cd/releases/download/v2.6.7/argocd-linux-amd64
+
+
+
 if [ -z "$(which startxfce4)" ]; then
     echo "Installing xfce..."
 
@@ -146,13 +142,3 @@ else
     sleep 0.2
 fi
 
-
-if [ -z "$(which k)" ]; then
-    echo 'alias k=kubectl' >> /home/vagrant/.bashrc
-fi
-
-echo "192.168.56.110" app1.com >> /etc/hosts
-echo "192.168.56.110" app2.com >> /etc/hosts
-echo "192.168.56.110" app3.com >> /etc/hosts
-echo "127.0.0.1" argocd.local >> /etc/hosts
-echo "127.0.0.1" wil42.local >> /etc/hosts

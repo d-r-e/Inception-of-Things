@@ -39,10 +39,21 @@ fi
 
 if [ -z "$(k3d cluster list | grep iot)" ];then
     echo "Creating k3d cluster..."
-    k3d cluster create  --port 8888:8888@loadbalancer  --port 80:80@loadbalancer iot --agents 1 --servers 1 --wait
+    k3d cluster create  --port 80:80@loadbalancer --port 8888:8888@loadbalancer  iot --agents 1 --servers 1 --wait
     echo [+] K3d cluster created successfully!
 else
     echo [+] K3d cluster already created.
     sleep 0.2
 fi
 
+
+# install pip and bcrypt to generate passwords
+if [ -z "$(which pip)" ]; then
+    echo "Installing pip..."
+    apt-get install -yq python3-pip >/dev/null
+    echo "[+] Pip installed successfully!"
+    pip install bcrypt python-dotenv
+else
+    echo "[+] Pip already installed."
+    sleep 0.2
+fi

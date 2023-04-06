@@ -22,14 +22,19 @@ sleep 0.2
 
 # kubectl port-forward svc/argocd-server -n argocd 8080:443
 echo 127.0.0.1 argocd.local >> /etc/hosts
-argocd login --insecure --core argocd.local
-argocd admin initial-password -n argocd --insecure | tee /home/vagrant/iot/p3/confs/argoCD/argocd.passwd
-echo ArgoCD password created successfully!
-echo Password:
-head -n 1 /home/vagrant/iot/p3/confs/argoCD/argocd.passwd
 
-argocd login --insecure --core --username admin --password $(head -n 1 /home/vagrant/iot/p3/confs/argoCD/argocd.passwd) argocd.local
+echo "Changin default password..."
+kubectl -n argocd patch secret argocd-secret \
+-p '{"stringData": {
+    "admin.password" : "$2b$12$gGm7jnNGfgadK0ZD03Ysheyrs1AZ/ETh/0T5rlcCiQAFLIryxGt3O",
+    "admin.passwordMtime" : "'$(date +%FT%T%Z)'"
+}}'
+echo [+] Default password changed successfully!
+sleep 0.2
+
+echo "ArgoCD is ready to use!"
+
+kubectl apply -f /home/vagrant/iot/p3/confs/argoCD/repo.yml -n argocd
 
 # kubectl apply -f /home/vagrant/iot/p3/confs/dev/namespace.yml -n dev
 # kubectl apply -f /home/vagrant/iot/p3/confs/dev/deployment.yml -n dev
-# kubectl apply -f /home/vagrant/iot/p3/confs/ingress.yml
