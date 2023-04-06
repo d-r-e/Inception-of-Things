@@ -1,3 +1,4 @@
+# https://github.com/d-r-e/darodrig-IoT-demo-project/tree/main/manifests
 apiVersion: v1
 kind: Service
 metadata:
@@ -38,7 +39,7 @@ metadata:
   namespace: dev
 spec:
   rules:
-  - host: wil-playground.local
+  - host: localhost
     http:
       paths:
       - path: /
