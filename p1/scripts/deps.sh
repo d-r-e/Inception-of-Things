@@ -6,22 +6,8 @@ function install_deps(){
     apt-get update && apt-get upgrade -y >/dev/null
 
     DEPENDENCIES=(zsh firefox-esr git wget gnupg curl ncdu linux-headers-amd64  linux-headers-5.10.0-20-amd64)
-
-    # Install dependencies
-    for dep in "${DEPENDENCIES[@]}"; do
-        if [ -z "$(which $dep)" ]; then
-            echo "Installing $dep..."
-            apt-get install -yq $dep >/dev/null
-            echo -e [+] "\e[32m$dep installed successfully!\e[0m"
-        else
-            echo -e [+] "\e[32m$dep already installed.\e[0m"
-            sleep 0.2
-        fi
-    done
-
+    apt-get install -yq ${DEPENDENCIES[@]} >/dev/null
 }
-
-
 
 install_deps
 
@@ -52,32 +38,12 @@ if [ -z "$(which vagrant)" ]; then
     wget -O- https://apt.releases.hashicorp.com/gpg | gpg --dearmor | tee /usr/share/keyrings/hashicorp-archive-keyring.gpg
     echo "deb [signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(lsb_release -cs) main" | tee /etc/apt/sources.list.d/hashicorp.list
     apt update && apt-get install -yq vagrant >/dev/null
-    # add vagrant user to vboxusers group
     /sbin/usermod -aG vboxusers vagrant
     echo -e [+] "\e[32mVagrant installed successfully!\e[0m"
 else
     echo -e [+] "\e[32mVagrant already installed.\e[0m"
     sleep 0.2
 fi
-
-
-
-
-# if [ -z "$(which kubectl)" ];then
-#   curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
-#   sudo install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
-# fi
-
-# apt install  -y lightdm
-# dpkg-reconfigure lightdm
-# /usr/sbin/lightdm --show-config
-# sed -i 's/#autologin-user=/autologin-user=vagrant/g' /etc/lightdm/lightdm.conf
-# sed -i 's/#autologin-user-timeout=0/autologin-user-timeout=0/g' /etc/lightdm/lightdm.conf
-
-# sed -i 's/#greeter-hide-users=false/greeter-hide-users=true/g' /etc/lightdm/lightdm.conf
-# apt install-y lightdm-gtk-greeter-settings
-# /sbin/reboot
-
 
 if [ -z "$(which k)" ]; then
     echo 'alias k=kubectl' >> /home/vagrant/.bashrc
@@ -133,12 +99,13 @@ EOF
         xfdesktop4 \
         xfwm4 \
         adwaita-qt \
-        qt5ct 
-
-    /sbin/reboot
-    echo
+        qt5ct \
+        xorg
 else
     echo -e [+] "\e[32mXfce already installed.\e[0m"
+
+# set resolution for "root" user to 1280x1024
+xrandr --newmode "1280x1024_60.00"  108.00  1280 1368 1504 1712  1024 1027 1034 1063 -hsync +vsync
     sleep 0.2
 fi
 

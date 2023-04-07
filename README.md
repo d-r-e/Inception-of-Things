@@ -8,15 +8,16 @@ USER=darodrig
 # first reset all possible vagrant machines
 vagrant destroy -f
 # then remove the .vagrant.d folder
+
+
 rm -rf $HOME/.vagrant.d
-
-
 mkdir -p /goinfre/$USER/.vagrant.d
 mkdir -p /goinfre/$USER/.vbox
 rm -rf $HOME/VirtualBox\ VMs
 ln -s $HOME/VirtualBox\ VMs /goinfre/$USER/.vbox
 ln -s /goinfre/$USER/.vagrant.d $HOME/.vagrant.d
 VAGRANT_HOME=/goinfre/$USER/.vagrant.d vagrant up --provision
+
 ```
 
 To get the ssh-config file, run the following command:
